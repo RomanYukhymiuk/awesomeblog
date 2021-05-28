@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # основний сервіс застосунку
+  webhost:
+    # назва образу для запуску
+    image: mydocker.example.invalid/webhost
+    # якщо зібранного образу немає - створити його. Використовувати лише у парі з параметром image, інакше образ буду перезбиратись кожного разу
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # файл із БД SQLite знаходиться у персистентному дисковому сховищі, окремо від контейнеру
+    volumes:
+      - .:/app
+      - db.sqlite3
+    # мапінг портів з контейнерів у основну операційну систему
+    ports:
+      - "8000:8000"
+  # сервіс, що запускає міграцію БД
+  migration:
+    image: mydocker.example.invalid/webhost_migration
+    build:
+      context: .
+      dockerfile: Dockerfile.migration
+    volumes:
+      - .:/app
+      - db.sqlite3
